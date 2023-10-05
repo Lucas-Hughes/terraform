@@ -1,0 +1,30 @@
+image: alpine:latest
+
+include:
+  template: Terraform-Module.gitlab-ci.yml
+
+variables:
+  TERRAFORM_MODULE_DIR: ${CI_PROJECT_DIR}/modules
+  TERRAFORM_MODULE_NAME: terraform-composite-modules-${CI_PROJECT_NAME}
+  TERRAFORM_MODULE_SYSTEM: aws
+  TERRAFORM_MODULE_VERSION: ${CI_COMMIT_TAG}
+  TERRAFORM_VERSION: "1.5.0"
+
+before_script:
+  - echo ${CI_PROJECT_DIR}
+  - echo terraform-composite-modules-${CI_PROJECT_NAME}
+  - echo commit-tag:${CI_COMMIT_TAG}
+
+go-test:
+  stage: test
+  script:
+    - apk --no-cache add wget go git musl-dev
+    - wget -q https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+    - unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /usr/local/bin/
+    - terraform -v
+    - cd ${CI_PROJECT_DIR}/test/
+    - go mod download
+    - go test ec2_test.go -v
+  rules:
+    - changes:
+        - test/*

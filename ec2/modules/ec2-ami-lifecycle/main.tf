@@ -1,8 +1,8 @@
 locals {
-  t_environment   = var.common_tags["t_environment"]
-  instance_name   = format("%s-%s", local.t_environment, var.instance_id)
-  backup_name     = format("%s-backup-%s", local.t_environment, var.instance_id)
-  cleanup_name    = format("%s-cleanup-%s", local.t_environment, var.instance_id)
+  t_environment = var.common_tags["t_environment"]
+  instance_name = format("%s-%s", local.t_environment, var.instance_id)
+  backup_name   = format("%s-backup-%s", local.t_environment, var.instance_id)
+  cleanup_name  = format("%s-cleanup-%s", local.t_environment, var.instance_id)
 }
 
 data "aws_iam_policy_document" "default" {
@@ -75,27 +75,28 @@ resource "aws_iam_role_policy" "ami_backup" {
   policy = data.aws_iam_policy_document.ami_backup.json
 }
 
+data "aws_caller_identity" "current" {}
+
 resource "aws_lambda_function" "ami_backup" {
   filename         = data.archive_file.ami_backup.output_path
   function_name    = local.backup_name
-  description      = "Automatically backup EC2 instance (create AMI)"
   role             = aws_iam_role.ami_backup.arn
-  timeout          = 60
   handler          = "ami_backup.lambda_handler"
   runtime          = "python3.9"
   source_code_hash = data.archive_file.ami_backup.output_base64sha256
   tags             = var.common_tags
 
   environment {
-    variables = {
+    variables = merge({
       region                = var.region
-      ami_owner             = var.ami_owner
+      ami_owner             = data.aws_caller_identity.current.account_id
       instance_id           = var.instance_id
       retention             = var.retention_days
       label_id              = local.instance_name
       reboot                = var.reboot ? "1" : "0"
       block_device_mappings = jsonencode(var.block_device_mappings)
-    }
+      tag_keys              = jsonencode(keys(var.common_tags))
+    }, var.common_tags)
   }
 }
 
@@ -113,7 +114,7 @@ resource "aws_lambda_function" "ami_cleanup" {
   environment {
     variables = {
       region      = var.region
-      ami_owner   = var.ami_owner
+      ami_owner   = data.aws_caller_identity.current.account_id
       instance_id = var.instance_id
       label_id    = local.instance_name
     }
@@ -136,7 +137,7 @@ resource "aws_cloudwatch_event_rule" "ami_backup" {
 }
 
 resource "aws_cloudwatch_event_rule" "ami_cleanup" {
-  name                = local.backup_name
+  name                = local.cleanup_name
   description         = "Schedule for AMI snapshot cleanup"
   schedule_expression = null_resource.schedule.triggers["cleanup"]
   depends_on          = [null_resource.schedule]

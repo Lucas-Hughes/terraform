@@ -16,12 +16,6 @@ variable "reboot" {
   default     = false
 }
 
-variable "ami_owner" {
-  type        = string
-  default     = ""
-  description = "AWS Account ID which is used as a filter for AMI list (e.g. `123456789012`)"
-}
-
 variable "region" {
   type        = string
   default     = "us-east-1"
@@ -40,7 +34,7 @@ variable "instance_id" {
 }
 
 variable "block_device_mappings" {
-  type        = list(string)
+  type        = list(object({ DeviceName = string }))
   description = "List of block device mappings to be included/excluded from created AMIs. With default value of [], AMIs will include all attached EBS volumes"
   default     = []
 }

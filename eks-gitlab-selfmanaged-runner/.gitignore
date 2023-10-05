@@ -1,8 +1,0 @@
-.gen
-.terraform
-tsconfig.tsbuildinfo
-.DS_Store
-.terraform.lock.hcl
-terraform.tfstate
-terraform.tfstate.backup
-.terraform/modules/modules.json
