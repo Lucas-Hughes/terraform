@@ -32,9 +32,6 @@ To use this repository, you need the following:
 - AWS account with appropriate permissions
 - [Terraform](https://www.terraform.io/downloads.html) installed (version 1.5.0 or later)
 - [Git](https://git-scm.com/downloads) installed
-- At least reporter permissions in GitLab
-- A personal access token created in GitLab and added to your ~/.terraformrc (see step 1 below)
-- A KMS grant created in your account to utilize PCM images in autoscaling groups
 
 ## Usage
 
@@ -42,29 +39,15 @@ Follow these steps to deploy the GitLab Runner on your AWS infrastructure:
 
 ### Step 1 (Optional if completed previously): Prerequisites
 
-## Create a GitLab personal access token and add to ~/.terraformrc
+## TODO
 
-To access the private terraform module registry from your local machine, you will need to authenticate to that registry using the personal access token created in the GitLab console.
-
-Click on your profile image -> edit profile -> Access Tokens -> Add New Token -> Create a token with api and read\_api permissions.
-
-Once the token value is generated, grab that token and place it in your ~/.terraformrc file using the following echo command. You can also place the token value using the text editor of your choice. If you do not have a a ~/.terraformrc, please create one.
-
-`echo 'credentials "gitlab.com" {token = "glpat-yourtokenvalue"}' >> ~/.terraformrc`
-
-This token will now allow us to run `terraform init` and pull the module into our local machine.
-
-## Create a KMS grant to PCM master account to utilize their AMIs in autoscaling groups
-
-Because the AMIs that are utilized in this module are created by PCM, we must have a grant in their account to decrypt their EBS volumes. All we need to do is run the following command in the account you're wanting to deploy the runner to, replacing `<your_account_id>` with the account ID:
-
-`aws kms create-grant --region us-east-1 --key-id arn:aws:kms:us-east-1:056952386373:key/0f0224cd-e20a-4011-bb5e-6bead7fb9747 --grantee-principal arn:aws:iam::<your_account_id>:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling --operations "Encrypt" "Decrypt" "ReEncryptFrom" "ReEncryptTo" "GenerateDataKey" "GenerateDataKeyWithoutPlaintext" "DescribeKey" "CreateGrant"`
+Work in progress to flesh this out for more public use
 
 ### Step 2: Copy the module block from below to the terraform main.tf you want to deploy the runners from.
 
 Please note that you must provide either the property `vpc_cidr_block` which will create a new vpc to host the runner or `private_subnets` which will create the runner in already existing private subnet(s).
 
-To find the version number, use the drop down for branch and find the latest `tag`. It will look like 2.1.7.
+To find the version number, use the drop down for branch and find the latest `tag`. It will look like 1.0.0
 
 ```hcl
 module "ec2_gitlab_runner" {
@@ -90,7 +73,7 @@ module "ec2_gitlab_runner" {
 
 If you are still unsure what a complete main.tf to deploy the runner should look like, please look at the ./examples/ directory to see a working example of the module being called. Please note that the source block will look different.
 
-### Step 3: Create a GitLab Runner Manager
+### Step 3: Create a GitLab Runner
 
 Due to token architecture changes, you need to create the GitLab runner manager inside the GitLab console and get a token from there.
 
