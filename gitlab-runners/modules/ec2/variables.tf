@@ -34,12 +34,6 @@ variable "region" {
   default     = "us-east-1"
 }
 
-variable "runner_ami_id_ssm_parameter_name" {
-  type        = string
-  description = "The name of the SSM parameter containing the AMI ID for the launch template"
-  default     = "pcm-amznlinux2023x86_64-prod-latest"
-}
-
 variable "runner_instance_type" {
   type        = string
   description = "The EC2 instance type for the GitLab Runner"

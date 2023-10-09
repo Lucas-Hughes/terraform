@@ -17,14 +17,12 @@ locals {
   iam_role_default_policies = {
     ssm = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
   }
+
   use_existing_role = var.runner_role != null ? true : false
   merged_policies   = local.use_existing_role ? {} : merge(local.iam_role_default_policies, var.additional_policies)
-
-  use_existing_vpc = var.private_subnets != null ? (length(var.private_subnets) > 0) : false
+  use_existing_vpc  = var.private_subnets != null ? (length(var.private_subnets) > 0) : false
 
 }
-
-data "aws_availability_zones" "available" {}
 
 provider "aws" {
   region = var.region
@@ -51,12 +49,6 @@ resource "aws_iam_role" "lambda_execution_role" {
   })
 }
 
-data "archive_file" "lambda" {
-  type        = "zip"
-  source_dir  = "${path.module}/lambda/code/"
-  output_path = "${path.module}/lambda/output/gitlab-runner-ami-update.zip"
-}
-
 #tfsec:ignore:aws-lambda-enable-tracing
 resource "aws_lambda_function" "runner_ami_update" {
   filename         = "${path.module}/lambda/output/gitlab-runner-ami-update.zip"
@@ -68,6 +60,13 @@ resource "aws_lambda_function" "runner_ami_update" {
   runtime          = "python3.9"
   source_code_hash = filesha256(data.archive_file.lambda.output_path)
   tags             = local.tags
+
+  environment {
+    variables = {
+      LAUNCH_TEMPLATE_NAME   = aws_launch_template.gitlab_runner.name
+      AUTOSCALING_GROUP_NAME = aws_autoscaling_group.runner_asg.name
+    }
+  }
 }
 
 resource "aws_lambda_permission" "runner_ami_update_permission" {
@@ -108,10 +107,6 @@ resource "aws_iam_role_policy_attachment" "lambda_role_policy" {
   depends_on = [aws_iam_policy.lambda_policy]
 }
 
-data "aws_ssm_parameter" "runner_ami_id" {
-  name = var.runner_ami_id_ssm_parameter_name
-}
-
 resource "aws_iam_role" "runner_role" {
   count = local.use_existing_role ? 0 : 1
   name  = "${local.project}-runner-role"
@@ -149,7 +144,7 @@ resource "aws_launch_template" "gitlab_runner" {
   tags                   = local.tags
   update_default_version = true
   vpc_security_group_ids = [aws_security_group.gitlab_runner_sg.id]
-  image_id               = var.custom_runner_ami != "" ? var.custom_runner_ami : data.aws_ssm_parameter.runner_ami_id.value
+  image_id               = var.custom_runner_ami != "" ? var.custom_runner_ami : data.aws_ami.latest_amazon_linux.id
   key_name               = var.key_name
 
   instance_market_options {
@@ -194,7 +189,7 @@ resource "aws_autoscaling_group" "runner_asg" {
 
   launch_template {
     id      = aws_launch_template.gitlab_runner.id
-    version = "$Latest" # Use the latest version of the launch template
+    version = "$Latest"
   }
 
   dynamic "tag" {
@@ -215,18 +210,9 @@ resource "aws_autoscaling_group" "runner_asg" {
 
 resource "aws_cloudwatch_event_rule" "ami_eventbridge_rule" {
   name                = "${local.project}-rule"
-  description         = "Trigger the Lambda function when the SSM parameter is updated"
+  description         = "Trigger the Lambda function daily to check for a new AMI"
   schedule_expression = "rate(24 hours)"
   tags                = local.tags
-
-  event_pattern = jsonencode({
-    "source" : ["aws.ssm"],
-    "detail-type" : ["Parameter Store Change"],
-    "detail" : {
-      "name" : [var.runner_ami_id_ssm_parameter_name],
-      "operation" : ["Update"]
-    }
-  })
 }
 
 resource "aws_cloudwatch_event_target" "ami_eventbridge_rule_target" {
@@ -257,11 +243,6 @@ module "vpc" {
   flow_log_destination_arn  = "arn:aws:s3:::central-vpcflowlogs-us-east-1-424004645979"
 }
 
-data "aws_subnet" "existing" {
-  count = local.use_existing_vpc ? 1 : 0
-  id    = var.private_subnets[0]
-}
-
 resource "aws_security_group" "gitlab_runner_sg" {
   name_prefix = "${local.project}-"
   description = "Security group for the GitLab Runner"
@@ -274,7 +255,6 @@ resource "aws_security_group" "gitlab_runner_sg" {
     cidr_blocks = ["0.0.0.0/0"]
     description = "Allow all outbound traffic"
   }
-
 
   tags = merge(local.tags, { "Name" = "${local.project}-sg" })
 }

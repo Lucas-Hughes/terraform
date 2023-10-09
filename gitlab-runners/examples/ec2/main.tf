@@ -9,12 +9,9 @@ module "new_vpc_ec2_runner" {
   project_name        = var.project_name
   vpc_cidr_block      = var.vpc_cidr_block
   tags                = var.tags
-  environment         = "DEMO"
+  environment         = "DEV"
 
   concurrency = 10
-
-  ecr_region = "us-east-1"
-  ecr_uri    = "177807608173.dkr.ecr.us-east-1.amazonaws.com/abcefgh"
 
   additional_policies = {
     "additional_policy" = "arn:aws:iam::aws:policy/job-function/SystemAdministrator"
@@ -26,18 +23,15 @@ module "existing_vpc_ec2_runner" {
 
   gitlab_runner_token = var.gitlab_runner_token
   project_name        = var.project_name_2
-  environment         = "DEMO"
+  environment         = "DEV"
   tags                = var.tags
 
   private_subnets = module.new_vpc_ec2_runner.private_subnets
   runner_role     = module.new_vpc_ec2_runner.runner_role
 
   concurrency         = 10
-  privileged          = true # do not use this unless you are sure you need it; use for DinD
+  privileged          = true # do not use this unless you are sure you need it; use for DinD and other mandatory tasks
   docker_runner_image = "docker:stable"
-
-  ecr_region = "us-east-1"
-  ecr_uri    = "177807608173.dkr.ecr.us-east-1.amazonaws.com/abcefgh"
 
   additional_policies = {
     "additional_policy" = "arn:aws:iam::aws:policy/job-function/SystemAdministrator"

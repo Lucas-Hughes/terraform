@@ -160,8 +160,8 @@ If you encounter any issues or have questions about this GitLab Runner configura
 | [aws_launch_template.gitlab_runner](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/launch_template) | resource |
 | [aws_security_group.gitlab_runner_sg](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [archive_file.lambda](https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file) | data source |
+| [aws_ami.latest_amazon_linux](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
-| [aws_ssm_parameter.runner_ami_id](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ssm_parameter) | data source |
 | [aws_subnet.existing](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet) | data source |
 
 #### Inputs
@@ -184,7 +184,6 @@ If you encounter any issues or have questions about this GitLab Runner configura
 | <a name="input_privileged"></a> [privileged](#input\_privileged) | Allows the docker containers to run in privileged mode. Necessary for DinD. Please note that this is insecure and should only be used if using DinD | `bool` | `false` | no |
 | <a name="input_project_name"></a> [project\_name](#input\_project\_name) | Prefix of the project that will be used throughout the deployment | `string` | `""` | no |
 | <a name="input_region"></a> [region](#input\_region) | AWS Region | `string` | `"us-east-1"` | no |
-| <a name="input_runner_ami_id_ssm_parameter_name"></a> [runner\_ami\_id\_ssm\_parameter\_name](#input\_runner\_ami\_id\_ssm\_parameter\_name) | The name of the SSM parameter containing the AMI ID for the launch template | `string` | `"pcm-amznlinux2023x86_64-prod-latest"` | no |
 | <a name="input_runner_asg_desired_size"></a> [runner\_asg\_desired\_size](#input\_runner\_asg\_desired\_size) | Desired number of instances you want running in the runner ASG | `number` | `2` | no |
 | <a name="input_runner_asg_max_size"></a> [runner\_asg\_max\_size](#input\_runner\_asg\_max\_size) | Max number of instances you want running in the runner ASG | `number` | `3` | no |
 | <a name="input_runner_asg_min_size"></a> [runner\_asg\_min\_size](#input\_runner\_asg\_min\_size) | Minimum number of instances you want running in the runner ASG | `number` | `1` | no |
