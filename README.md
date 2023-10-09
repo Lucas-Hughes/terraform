@@ -1,12 +1,11 @@
 <!-- BEGIN_TF_DOCS -->
 
-# Terraform AWS Compute Composite Modules
+# Terraform AWS GitLab-Runner Composite Modules
 The modules contained in this directory are comprised of multiple other resources/module blocks in order to create a reusable service.
 
 It supports creating:
 
-- AMI lifecycle using lambdas
-- EC2 backed database
+- EC2 hosted GitLab Runner
 
 #### Requirements
 
