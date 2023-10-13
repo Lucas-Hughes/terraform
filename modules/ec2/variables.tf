@@ -49,7 +49,7 @@ variable "ebs_kms_key_id" {
 
 variable "custom_runner_ami" {
   type        = string
-  description = "Custom AMI to be used in the GitLab runner. If left blank, it will source the PCM Amazon Linux 2 image"
+  description = "Custom AMI to be used in the GitLab runner. If left blank, it will source the latest Amazon Linux 2 image"
   default     = ""
 }
 

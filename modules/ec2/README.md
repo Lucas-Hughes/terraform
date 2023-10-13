@@ -171,7 +171,7 @@ If you encounter any issues or have questions about this GitLab Runner configura
 | <a name="input_gitlab_runner_token"></a> [gitlab\_runner\_token](#input\_gitlab\_runner\_token) | GitLab Runner Token | `string` | n/a | yes |
 | <a name="input_additional_policies"></a> [additional\_policies](#input\_additional\_policies) | Additional IAM policies to be merged. Format is whatever\_name = arn\_of\_policy. | `map(string)` | `{}` | no |
 | <a name="input_concurrency"></a> [concurrency](#input\_concurrency) | The amount of jobs you want to run concurrently - https://docs.gitlab.com/runner/configuration/advanced-configuration.html | `number` | `15` | no |
-| <a name="input_custom_runner_ami"></a> [custom\_runner\_ami](#input\_custom\_runner\_ami) | Custom AMI to be used in the GitLab runner. If left blank, it will source the PCM Amazon Linux 2 image | `string` | `""` | no |
+| <a name="input_custom_runner_ami"></a> [custom\_runner\_ami](#input\_custom\_runner\_ami) | Custom AMI to be used in the GitLab runner. If left blank, it will source the latest Amazon Linux 2 image | `string` | `""` | no |
 | <a name="input_docker_runner_image"></a> [docker\_runner\_image](#input\_docker\_runner\_image) | The image to run jobs with inside the container | `string` | `"alpine:latest"` | no |
 | <a name="input_ebs_kms_key_id"></a> [ebs\_kms\_key\_id](#input\_ebs\_kms\_key\_id) | KMS Key ID to encrypt EBS volumes on the GitLab Runner | `string` | `""` | no |
 | <a name="input_ecr_region"></a> [ecr\_region](#input\_ecr\_region) | The AWS region of the ECR repository. Defaults to '' | `string` | `""` | no |
