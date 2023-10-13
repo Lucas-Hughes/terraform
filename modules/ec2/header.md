@@ -1,6 +1,8 @@
-  This module is designed to create GitLab runner executors in EC2.
+<!-- BEGIN_TF_DOCS -->
 
-  # GitLab Runner on EC2 with Docker Exectuors
+This module is designed to create GitLab runner executors in EC2.
+
+# GitLab Runner on EC2 with Docker Exectuors
 
 This repository contains a Terraform module for deploying a self-managed GitLab Runner on an EC2 instance with a Docker executor.
 
@@ -21,7 +23,7 @@ By default, this will only have the SSM core role and other necessary, minimalis
 
 ## Overview
 
-The GitLab Runner is responsible for executing CI/CD jobs defined in your GitLab projects. The runner lives in GitLab and utilizes Docker containers on the instances to execute jobs. 
+The GitLab Runner is responsible for executing CI/CD jobs defined in your GitLab projects. The runner lives in GitLab and utilizes Docker containers on the instances to execute jobs.
 
 ## Prerequisites
 
@@ -37,30 +39,28 @@ Follow these steps to deploy the GitLab Runner on your AWS infrastructure:
 
 ### Step 1 (Optional if completed previously): Prerequisites
 
-## TODO
-
-Work in progress to flesh this out for more public use
+- Install Terraform
+- Have a GitLab account
 
 ### Step 2: Copy the module block from below to the terraform main.tf you want to deploy the runners from.
 
-Please note that you must provide either the property `vpc_cidr_block` which will create a new vpc to host the runner or `private_subnets` which will create the runner in already existing private subnet(s). 
+Please note that you must provide either the property `vpc_cidr_block` which will create a new vpc to host the runner or `private_subnets` which will create the runner in already existing private subnet(s).
 
 To find the version number, use the drop down for branch and find the latest `tag`. It will look like 1.0.0
 
 ```hcl
 module "ec2_gitlab_runner" {
-  source  = ""
-  version = "latest" # needs to be a specific version
+  source  = "Lucas-Hughes/gitlab-runner/aws//modules/ec2"
+  version = "1.0.0"
 
   gitlab_runner_token = var.gitlab_runner_token # put this in a terraform.tfvars and do not commit it to VCS!
-  project_name        = "test-forge-ec2-module" 
+  project_name        = "gitlab-runner"
   vpc_cidr_block      = "145.0.0.0/24"
   environment         = "DEMO"
 
   tags = {
-    "t_AppID" = "SVC03377"
-    "t_dcl"   = "3"
     "Owner"   = "lucas.j.hughes@outlook.com"
+    "Project" = "GitLab.Runner
   }
 
   additional_policies = {

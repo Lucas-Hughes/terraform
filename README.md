@@ -5,6 +5,7 @@ The modules contained in this directory are comprised of multiple other resource
 
 It supports creating:
 
+- EKS hosted GitLab Runner
 - EC2 hosted GitLab Runner
 
 #### Requirements

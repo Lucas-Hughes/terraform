@@ -8,6 +8,7 @@ variable "gitlab_runner_token" {
 variable "tags" {
   description = "Common tags for all resources"
   type        = map(string)
+  default     = {}
 }
 
 variable "environment" {

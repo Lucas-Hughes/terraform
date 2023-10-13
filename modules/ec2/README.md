@@ -1,8 +1,10 @@
 <!-- BEGIN_TF_DOCS -->
 
-  This module is designed to create GitLab runner executors in EC2.
+<!-- BEGIN\_TF\_DOCS -->
 
-  # GitLab Runner on EC2 with Docker Exectuors
+This module is designed to create GitLab runner executors in EC2.
+
+# GitLab Runner on EC2 with Docker Exectuors
 
 This repository contains a Terraform module for deploying a self-managed GitLab Runner on an EC2 instance with a Docker executor.
 
@@ -39,9 +41,8 @@ Follow these steps to deploy the GitLab Runner on your AWS infrastructure:
 
 ### Step 1 (Optional if completed previously): Prerequisites
 
-## TODO
-
-Work in progress to flesh this out for more public use
+- Install Terraform
+- Have a GitLab account
 
 ### Step 2: Copy the module block from below to the terraform main.tf you want to deploy the runners from.
 
@@ -51,18 +52,17 @@ To find the version number, use the drop down for branch and find the latest `ta
 
 ```hcl
 module "ec2_gitlab_runner" {
-  source  = ""
-  version = "latest" # needs to be a specific version
+  source  = "Lucas-Hughes/gitlab-runner/aws//modules/ec2"
+  version = "1.0.0"
 
   gitlab_runner_token = var.gitlab_runner_token # put this in a terraform.tfvars and do not commit it to VCS!
-  project_name        = "test-forge-ec2-module"
+  project_name        = "gitlab-runner"
   vpc_cidr_block      = "145.0.0.0/24"
   environment         = "DEMO"
 
   tags = {
-    "t_AppID" = "SVC03377"
-    "t_dcl"   = "3"
     "Owner"   = "lucas.j.hughes@outlook.com"
+    "Project" = "GitLab.Runner
   }
 
   additional_policies = {
@@ -169,7 +169,6 @@ If you encounter any issues or have questions about this GitLab Runner configura
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_gitlab_runner_token"></a> [gitlab\_runner\_token](#input\_gitlab\_runner\_token) | GitLab Runner Token | `string` | n/a | yes |
-| <a name="input_tags"></a> [tags](#input\_tags) | Common tags for all resources | `map(string)` | n/a | yes |
 | <a name="input_additional_policies"></a> [additional\_policies](#input\_additional\_policies) | Additional IAM policies to be merged. Format is whatever\_name = arn\_of\_policy. | `map(string)` | `{}` | no |
 | <a name="input_concurrency"></a> [concurrency](#input\_concurrency) | The amount of jobs you want to run concurrently - https://docs.gitlab.com/runner/configuration/advanced-configuration.html | `number` | `15` | no |
 | <a name="input_custom_runner_ami"></a> [custom\_runner\_ami](#input\_custom\_runner\_ami) | Custom AMI to be used in the GitLab runner. If left blank, it will source the PCM Amazon Linux 2 image | `string` | `""` | no |
@@ -189,6 +188,7 @@ If you encounter any issues or have questions about this GitLab Runner configura
 | <a name="input_runner_asg_min_size"></a> [runner\_asg\_min\_size](#input\_runner\_asg\_min\_size) | Minimum number of instances you want running in the runner ASG | `number` | `1` | no |
 | <a name="input_runner_instance_type"></a> [runner\_instance\_type](#input\_runner\_instance\_type) | The EC2 instance type for the GitLab Runner | `string` | `"t3.medium"` | no |
 | <a name="input_runner_role"></a> [runner\_role](#input\_runner\_role) | Name of the existing role to be used for deployment. | `string` | `null` | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | Common tags for all resources | `map(string)` | `{}` | no |
 | <a name="input_user_data_file"></a> [user\_data\_file](#input\_user\_data\_file) | Path to custom user data file | `string` | `null` | no |
 | <a name="input_user_data_variables"></a> [user\_data\_variables](#input\_user\_data\_variables) | Map of variables to be used inside of userdata | `map(any)` | `{}` | no |
 | <a name="input_vpc_cidr_block"></a> [vpc\_cidr\_block](#input\_vpc\_cidr\_block) | VPC CIDR block | `string` | `null` | no |
